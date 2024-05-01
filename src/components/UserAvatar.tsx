@@ -13,8 +13,8 @@ type Props = {
 const UserAvatar = ({ user }: Props) => {
     return (
         <Avatar>
-            {user.image ? (
-                <AvatarImage  src={user.image} alt='image profile' referrerPolicy='no-referrer'/>
+            {user?.image ? (
+                <AvatarImage  src={user?.image} alt='image profile' referrerPolicy='no-referrer'/>
                 
             ) : (
                 <AvatarFallback><span className='sr-only'>{user.name}</span></AvatarFallback>

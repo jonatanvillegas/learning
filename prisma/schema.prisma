@@ -46,7 +46,7 @@ model User {
   email         String?   @unique
   emailVerified DateTime?
   image         String?
-  credist       Int @default(10)
+  credist       Int @default(5)
   accounts      Account[]
   sessions      Session[]
 }
@@ -57,4 +57,47 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+//modelo de la tabla course
+model Course{
+  id String @id @default(cuid())
+  name String 
+  image String
+  units Unit[]
+}
+
+//modelo de la tabla unidad
+model Unit{
+  id String @id @default(cuid())
+  courseId String
+  name String
+  //relacion entre tablas 
+  course Course @relation(fields: [courseId], references: [id])
+  chapters Chapter[]
+  @@index([courseId], name: "courseId")
+}
+//tabla de capitulos
+model Chapter{
+  id String @id @default(cuid())
+  unitId String
+  name String
+  youtubeSearchQuery String
+  videoId String?
+  summary String? @db.VarChar(3000)
+  unit  Unit @relation(fields: [unitId], references: [id])
+  questions Question[]
+  @@index([unitId], name: "unitId")
+}
+
+model Question {
+  id String @id @default(cuid())
+  chapterId String
+
+  question String @db.VarChar(3000)
+  answer String @db.VarChar(3000)
+  options String @db.VarChar(3000)
+  chapter Chapter @relation(fields: [chapterId], references: [id])
+
+  @@index([chapterId], name:"chapterId")
 }
