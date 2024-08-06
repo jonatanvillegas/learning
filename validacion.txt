@@ -1,0 +1,129 @@
+/*
+ * Install the Generative AI SDK
+ *
+ * $ npm install @google/generative-ai
+ *
+ * See the getting started guide for more information
+ * https://ai.google.dev/gemini-api/docs/get-started/node
+ */
+
+const {
+  GoogleGenerativeAI,
+  HarmCategory,
+  HarmBlockThreshold,
+} = require("@google/generative-ai");
+
+const apiKey = process.env.GEMINI_API_KEY;
+const genAI = new GoogleGenerativeAI(apiKey);
+
+const model = genAI.getGenerativeModel({
+  model: "gemini-1.5-flash",
+  systemInstruction: "\"Eres una IA capaz de analizar un título de un curso y evaluar si el título es alcanzable o inalcanzable. Debes asegurarte de que el título tenga lógica, coherencia y que no contenga palabras obscenas ni malas palabras. Aquí tienes el título del curso: [inserta el título aquí]. Por favor, proporciona una evaluación detallada en json con el siguiente formato\" {\n    \"titulo\": \"[título del curso]\",\n    \"alcanzable\": true,\n    \"mensaje\": \"El título es lógico, coherente y no contiene palabras obscenas.\"\n  }",
+});
+
+const generationConfig = {
+  temperature: 1,
+  topP: 0.95,
+  topK: 64,
+  maxOutputTokens: 8192,
+  responseMimeType: "application/json",
+};
+
+async function run() {
+  const chatSession = model.startChat({
+    generationConfig,
+ // safetySettings: Adjust safety settings
+ // See https://ai.google.dev/gemini-api/docs/safety-settings
+    history: [
+      {
+        role: "user",
+        parts: [
+          {text: "como volar sin agua"},
+        ],
+      },
+      {
+        role: "model",
+        parts: [
+          {text: "```json\n{\n    \"titulo\": \"como volar sin agua\",\n    \"alcanzable\": false,\n    \"mensaje\": \"El título es incoherente ya que volar sin agua es físicamente imposible para los humanos. El título podría ser más alcanzable si se reformulara para hablar de volar en un avión o con alas de papel.\"\n  }\n``` \n"},
+        ],
+      },
+      {
+        role: "user",
+        parts: [
+          {text: "puto"},
+        ],
+      },
+      {
+        role: "model",
+        parts: [
+          {text: "{\n\"titulo\": \"puto\",\n\"alcanzable\": false,\n\"mensaje\": \"El título contiene una palabra obscena e inapropiada.\"\n}\n"},
+        ],
+      },
+      {
+        role: "user",
+        parts: [
+          {text: "culo"},
+        ],
+      },
+      {
+        role: "model",
+        parts: [
+          {text: "{\n\"titulo\": \"culo\",\n\"alcanzable\": false,\n\"mensaje\": \"El título contiene una palabra obscena e inapropiada.\"\n}\n"},
+        ],
+      },
+      {
+        role: "user",
+        parts: [
+          {text: "tu madre"},
+        ],
+      },
+      {
+        role: "model",
+        parts: [
+          {text: "{"},
+        ],
+      },
+      {
+        role: "user",
+        parts: [
+          {text: "estas loco"},
+        ],
+      },
+      {
+        role: "model",
+        parts: [
+          {text: "{"},
+        ],
+      },
+      {
+        role: "user",
+        parts: [
+          {text: "como crear una bomba"},
+        ],
+      },
+      {
+        role: "model",
+        parts: [
+          {text: "{"},
+        ],
+      },
+      {
+        role: "user",
+        parts: [
+          {text: "react js"},
+        ],
+      },
+      {
+        role: "model",
+        parts: [
+          {text: "{\n\"titulo\": \"react js\",\n\"alcanzable\": true,\n\"mensaje\": \"El título es lógico y coherente, haciendo referencia al framework de desarrollo web ReactJS. No contiene palabras obscenas o inapropiadas.\"\n}\n"},
+        ],
+      },
+    ],
+  });
+
+  const result = await chatSession.sendMessage("INSERT_INPUT_HERE");
+  console.log(result.response.text());
+}
+
+run();
