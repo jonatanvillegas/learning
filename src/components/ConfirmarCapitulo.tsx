@@ -1,7 +1,7 @@
 "use client";
 import React from 'react'
-import ChapterCard from './ChapterCard';
-import { Separator } from '@radix-ui/react-separator';
+import ChapterCard, { ChapterCardHandler } from './ChapterCard';
+import { Separator } from '@/components/ui/separator';
 import { Button, buttonVariants } from './ui/button';
 import Link from 'next/link';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
@@ -44,6 +44,16 @@ type Props = {
 
 
 const ConfirmarCapitulo = ({ course }: Props) => {
+
+    const chapterRefs: Record<string, React.RefObject<ChapterCardHandler>> = {}
+
+    course.units.forEach(unit =>{
+        unit.chapters.forEach(chapter => {
+            chapterRefs[chapter.id] = React.useRef()
+        })
+    })
+
+    
     return (
         <div className='w-full mt-5'>
             {course.units.map((unit, unitIndex) => {
@@ -59,6 +69,7 @@ const ConfirmarCapitulo = ({ course }: Props) => {
                             {unit.chapters.map((chapter, chapterIndex) => {
                                 return (
                                     <ChapterCard
+                                        ref={chapterRefs[chapter.id]}
                                         key={chapter.id}
                                         chapter={chapter}
                                         chapterIndex={chapterIndex}
@@ -83,12 +94,17 @@ const ConfirmarCapitulo = ({ course }: Props) => {
                     <Button
                         type='button'
                         className='ml-4 font-semibold'
+                        onClick={()=>{
+                            Object.values(chapterRefs).forEach((ref)=>{
+                                ref.current?.triggerLoad()
+                            })
+                        }}
                     >
                         Generar
                         <ChevronRight className='w-4 h-4  ml-2' strokeWidth={4} />
                     </Button>
-                    <Separator className='flex-[1]' />
                 </div>
+                    <Separator className='flex-[1]' />
             </div>
         </div>
     )

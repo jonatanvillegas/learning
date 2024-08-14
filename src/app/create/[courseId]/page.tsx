@@ -1,4 +1,4 @@
-import ConfirmarCapitulo from '@/components/ui/ConfirmarCapitulo'
+import ConfirmarCapitulo from '@/components/ConfirmarCapitulo'
 import { getAuthSession } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import { Course } from '@prisma/client'

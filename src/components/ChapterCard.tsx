@@ -1,4 +1,6 @@
 import { cn } from '@/lib/utils';
+import { useMutation } from '@tanstack/react-query';
+import axios from 'axios';
 import React, { useState } from 'react'
 
 type Chapter = {
@@ -13,9 +15,32 @@ type Props = {
     chapterIndex: number
 }
 
-const ChapterCard = ({chapter,chapterIndex}: Props) => {
+export type ChapterCardHandler = {
+    triggerLoad: ()=> void
+}
+const ChapterCard = React.forwardRef<ChapterCardHandler, Props>( 
+    ({chapter,chapterIndex}, ref) => {
+        const [success, setSuccess] = useState<Boolean | null>(null)
+        const {mutate: obtenerInfoCap, isPending} = useMutation(
+            {
+                mutationFn: async ()=>{
+                    const response = await axios.post("/api/chapter/getInfo",{chapterId: chapter.id})
+                    return response.data
+    
+                }
+            }
+        )
+        
+    React.useImperativeHandle(ref,()=>({
+        async triggerLoad() {
+            obtenerInfoCap(undefined,{
+                onSuccess: ()=>{
+                    console.log("success")
+                }
+            })
+        }
+    }))
 
-    const [success, setSuccess] = useState<Boolean | null>(null)
   return (
     <div key={chapter.id} className={cn("px-4  py-2 mt-2 rounded-md flex justify-between",{
         "bg-secondary": success === null,
@@ -27,6 +52,7 @@ const ChapterCard = ({chapter,chapterIndex}: Props) => {
 
     </div>
   )
-}
+})
 
+ChapterCard.displayName = "ChapterCard"
 export default ChapterCard
