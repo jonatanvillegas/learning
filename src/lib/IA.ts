@@ -16,7 +16,12 @@ const modelQuery = genAI.getGenerativeModel({
 //transcripcion del video
 const modelTranscription = genAI.getGenerativeModel({
   model: "gemini-1.5-pro",
-  systemInstruction: "Eres una IA capaz de resumir una transcripción de youtube\n\nResuma en 150 palabras o menos y no hable de los patrocinadores ni nada que no esté relacionado con el tema principal, tampoco presente de qué trata el resumen.\n\nde esta manera devolveras la resouesta { summary: \"summary of the transcript\" }",
+  systemInstruction: "Eres una IA capaz de resumir una transcripción de youtube\n\nResuma en 300 palabras o menos y no hable de los patrocinadores ni nada que no esté relacionado con el tema principal, tampoco presente de qué trata el resumen.\n\nde esta manera devolveras la resouesta { summary: \"summary of the transcript\" }",
+});
+
+const modelGenerateQuestions = genAI.getGenerativeModel({
+  model: "gemini-1.5-pro",
+  systemInstruction: "Eres una IA útil que puede generar preguntas y respuestas de mcq, la longitud de cada respuesta no debe exceder las 15 palabras.\n\nDebe generar una pregunta mcq difícil aleatoria sobre el titulo que te vana proporcionar con el contexto de la siguiente transcripción que te proporcionaran , genera un arreglo de 5 con esta estructura \n\n {\n      question: \"question\",\n      answer: \"answer with max length of 15 words\",\n      option1: \"option1 with max length of 15 words\",\n      option2: \"option2 with max length of 15 words\",\n      option3: \"option3 with max length of 15 words\",\n    }",
 });
 
 const generationConfig = {
@@ -146,3 +151,35 @@ export const chatSessionTranscript = modelTranscription.startChat({
   ],
 });
 
+
+export const chatGenerateQuestions = modelGenerateQuestions.startChat({
+  generationConfig,
+  // safetySettings: Adjust safety settings
+  // See https://ai.google.dev/gemini-api/docs/safety-settings
+  history: [
+    {
+      role: "user",
+      parts: [
+        { text: "tema eventos en react transcripcion El video trata sobre el manejo de eventos en React. Se explica que los eventos en React se nombran usando camel case y que se les debe pasar una función para controlarlos. Se muestra cómo enlazar una función a un evento usando 'bind' en el constructor de la clase y también se presenta la alternativa de usar 'public class fields' como una característica experimental de JavaScript." },
+      ],
+    },
+    {
+      role: "model",
+      parts: [
+        { text: "[\n  {\n    question: \"¿Cómo se nombran los eventos en React?\",\n    answer: \"Usando camel case.\",\n    option1: \"Usando snake case.\",\n    option2: \"Usando Pascal Case.\",\n    option3: \"Igual que en HTML.\",\n  },\n  {\n    question: \"¿Qué se usa para pasar una función a un evento?\",\n    answer: \"Una función de controlador.\",\n    option1: \"Un callback.\",\n    option2: \"Un listener.\",\n    option3: \"Un manejador.\",\n  },\n  {\n    question: \"¿Cómo se enlaza una función en el constructor?\",\n    answer: \"Usando 'bind'.\",\n    option1: \"Usando 'this'.\",\n    option2: \"Usando 'new'.\",\n    option3: \"No se puede.\",\n  },\n  {\n    question: \"¿Qué son 'public class fields'?\",\n    answer: \"Una característica experimental.\",\n    option1: \"Una librería externa.\",\n    option2: \"Parte del estándar de JS.\",\n    option3: \"Un componente de React.\",\n  },\n  {\n    question: \"¿Qué tipo de dato recibe un manejador de eventos?\",\n    answer: \"Un objeto de evento sintético.\",\n    option1: \"Un objeto de evento nativo.\",\n    option2: \"Una función.\",\n    option3: \"Un string.\",\n  },\n]" },
+      ],
+    },
+    {
+      role: "user",
+      parts: [
+        { text: "react js React es una biblioteca de JavaScript desarrollada por Facebook, usada para construir interfaces de usuario. Su enfoque principal es la creación de aplicaciones web de una sola página, donde se desea que la experiencia del usuario sea rápida y fluida. React permite a los desarrolladores crear componentes reutilizables que son piezas individuales de la interfaz de usuario, lo que facilita el mantenimiento y la expansión de la aplicación a lo largo del tiempo.\n\nUna de las características más destacadas de React es el \"Virtual DOM\", un sistema que permite realizar actualizaciones eficientes en la interfaz de usuario. En lugar de manipular el DOM real directamente, React crea una copia virtual del DOM y realiza todas las actualizaciones en esta copia primero. Luego, React compara esta versión virtual con la real y realiza solo los cambios necesarios, lo que optimiza el rendimiento de la aplicación.\n\nReact utiliza JSX, una extensión de JavaScript que permite escribir código que se parece a HTML dentro de los archivos JavaScript. Aunque JSX es opcional, su uso se ha vuelto muy popular porque facilita la visualización de la estructura de los componentes.\n\nAdemás, React se integra bien con otras bibliotecas y frameworks, permitiendo a los desarrolladores elegir la mejor herramienta para cada parte de la aplicación. En resumen, React es una opción poderosa y flexible para desarrollar interfaces de usuario modernas y eficientes." },
+      ],
+    },
+    {
+      role: "model",
+      parts: [
+        { text: "[\n  {\n    question: \"¿Cuál es la función principal del Virtual DOM en React?\",\n    answer: \"Optimizar actualizaciones de UI.\",\n    option1: \"Renderizar HTML estático.\",\n    option2: \"Manejar eventos del usuario.\",\n    option3: \"Comunicarse con el servidor.\", \n  },\n  {\n    question: \"¿Qué es JSX en el contexto de React?\",\n    answer: \"Una extensión de JavaScript.\",\n    option1: \"Un lenguaje de plantillas.\",\n    option2: \"Una biblioteca de estilos.\",\n    option3: \"Un framework MVC.\",\n  },\n  {\n    question: \"¿Qué tipo de aplicaciones se beneficia más con React?\",\n    answer: \"Aplicaciones web de una sola página.\",\n    option1: \"Aplicaciones móviles nativas.\",\n    option2: \"Sistemas operativos complejos.\",\n    option3: \"Programas de análisis de datos.\",\n  },\n  {\n    question: \"¿Qué facilita la reutilización de código en React?\",\n    answer: \"La creación de componentes.\",\n    option1: \"El uso de funciones puras.\",\n    option2: \"La herencia prototípica.\",\n    option3: \"El tipado estático de datos.\",\n  },\n  {\n    question: \"React fue desarrollado por:\",\n    answer: \"Facebook\",\n    option1: \"Google\",\n    option2: \"Amazon\",\n    option3: \"Microsoft\",\n  },\n]\n" },
+      ],
+    },
+  ],
+});
